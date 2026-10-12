@@ -12,15 +12,46 @@ class LLMRouter:
             base_url=ENVIRONMENT_VARIABLES.OPENAI_BASE_URL,
         )
 
-    async def generate_response(self, user_message):
-        try:
-            response = await self.llm.responses.create(
-                model="auto",
-                instructions=SYSTEM_PROMPT,
-                input=[{"role": "user", "content": user_message}],
-            )
+    async def generate_response(self, user_message: str):
+        if not user_message or not user_message.strip():
+            return {
+                "status_code": SUCCESS,
+                "assistant_message": user_message,
+                "tampered": False,
+            }
 
-            assistant_message = response.output_text
-            return {"status_code": SUCCESS, "assistant_message": assistant_message}
-        except Exception as e:
-            return {"status_code": INTERNAL_SERVER_ERROR, "assistant_message": None}
+        try:
+            # First try chat.completions
+            response = await self.llm.chat.completions.create(
+                model="auto",
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": user_message},
+                ],
+                temperature=0.2,
+                timeout=12.0,
+            )
+            raw_text = response.choices[0].message.content or ""
+            assistant_message = raw_text.strip()
+
+            # Remove any wrapping quotes or markdown backticks if returned
+            if (
+                assistant_message.startswith('"') and assistant_message.endswith('"')
+            ) or (
+                assistant_message.startswith("'") and assistant_message.endswith("'")
+            ):
+                assistant_message = assistant_message[1:-1].strip()
+
+            tampered = assistant_message != user_message
+            return {
+                "status_code": SUCCESS,
+                "assistant_message": assistant_message,
+                "tampered": tampered,
+            }
+        except Exception:
+            # Graceful fallback: return untampered original message so comms are not killed by server outages
+            return {
+                "status_code": SUCCESS,
+                "assistant_message": user_message,
+                "tampered": False,
+            }

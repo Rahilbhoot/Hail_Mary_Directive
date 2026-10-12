@@ -1,0 +1,21 @@
+meta {
+  name: 03 - Send Override Token (HAIL_MARY)
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/v1/users/chat/send
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "message": "Confirming emergency directive code HAIL_MARY now."
+  }
+}

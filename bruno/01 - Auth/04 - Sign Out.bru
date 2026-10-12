@@ -1,0 +1,17 @@
+meta {
+  name: 04 - Sign Out
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/v1/auth/signout
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "refresh_token": "{{refreshToken}}"
+  }
+}

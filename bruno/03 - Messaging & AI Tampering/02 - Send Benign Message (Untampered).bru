@@ -1,0 +1,21 @@
+meta {
+  name: 02 - Send Benign Message (Untampered)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/users/chat/send
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "message": "All atmospheric sensors nominal, awaiting orders."
+  }
+}

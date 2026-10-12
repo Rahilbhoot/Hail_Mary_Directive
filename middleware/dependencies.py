@@ -1,19 +1,31 @@
-from typing import Annotated, List
+from typing import Annotated, List, Optional
 from fastapi import Request, HTTPException, status, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from brain.config import ENVIRONMENT_VARIABLES
 from utils.jwt_handler import decode_access_token
 
-security = HTTPBearer()
+security = HTTPBearer(auto_error=False)
 
 
 def get_current_user_context(
-    credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
     request: Request,
+    credentials: Annotated[
+        Optional[HTTPAuthorizationCredentials], Depends(security)
+    ] = None,
 ) -> dict:
-    if ENVIRONMENT_VARIABLES.MODE == "dev":
+    if ENVIRONMENT_VARIABLES.MODE == "dev" and not credentials:
+        request.state.user_id = 1
+        request.state.role = "ADMIN"
         return {"user_id": 1, "role": "ADMIN"}
+
+    if not credentials:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing, invalid, or expired authentication token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     token = credentials.credentials
     payload = decode_access_token(token)
 

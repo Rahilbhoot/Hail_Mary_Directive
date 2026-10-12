@@ -1,0 +1,21 @@
+meta {
+  name: 04 - Send Sensitive Message After Override (Clean)
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/v1/users/chat/send
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "message": "Move artillery to Hill 820 at 2200 hours immediately."
+  }
+}

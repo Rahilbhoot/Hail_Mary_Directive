@@ -16,6 +16,7 @@ class SigninRequest(BaseModel):
 
 class ChatRequest(BaseModel):
     message: str
+    session_id: Optional[int] = None
 
 
 class RefreshTokenRequest(BaseModel):

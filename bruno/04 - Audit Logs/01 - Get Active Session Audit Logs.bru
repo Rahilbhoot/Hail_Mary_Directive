@@ -1,0 +1,15 @@
+meta {
+  name: 01 - Get Active Session Audit Logs
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/users/chat/audit-logs
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

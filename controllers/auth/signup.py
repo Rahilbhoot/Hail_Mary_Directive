@@ -19,11 +19,21 @@ async def sign_up(user_data: SignupRequest):
     with Session(Engine) as s:
         try:
             user_data = user_data.model_dump()
+            user_role = user_data.get("role") or "mc"
+            from constants.enums import UserRole
+
+            try:
+                role_enum = UserRole(user_role.lower())
+            except Exception:
+                role_enum = UserRole.MC
+
+            raw_name = user_data.get("name") or "User"
             new_user = Users(
-                name=user_data.get("name"),
+                username=raw_name,
+                name=raw_name,
                 email=user_data.get("email"),
                 password=hash_password(user_data.get("password")),
-                role=user_data.get("role"),
+                role=role_enum,
                 created_at=datetime.now(),
             )
             s.add(new_user)
