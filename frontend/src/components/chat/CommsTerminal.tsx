@@ -2,11 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useGame } from '../../context/GameContext';
 import { useAuth } from '../../context/AuthContext';
 import { MessageEntry } from './MessageEntry';
-import { QuickTransmissions } from './QuickTransmissions';
 import { StatusBadge } from '../ui/StatusBadge';
 import { GlowingButton } from '../ui/GlowingButton';
 import { soundFx } from '../../services/audio';
-import { Send, ShieldAlert, ShieldCheck, Users, Radio, RefreshCw } from 'lucide-react';
+import { Send, Users, Radio, RefreshCw } from 'lucide-react';
 
 export const CommsTerminal: React.FC = () => {
   const {
@@ -35,10 +34,6 @@ export const CommsTerminal: React.FC = () => {
     const textToSend = inputText;
     setInputText('');
     await sendMessage(textToSend);
-  };
-
-  const handlePresetSelect = (text: string) => {
-    setInputText(text);
   };
 
   if (!activeSession) {
@@ -78,8 +73,6 @@ export const CommsTerminal: React.FC = () => {
       </div>
     );
   }
-
-  const isOverridden = activeSession.token_found;
 
   return (
     <div
@@ -145,13 +138,6 @@ export const CommsTerminal: React.FC = () => {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {/* AI Interception Status Badge */}
-          {isOverridden ? (
-            <StatusBadge status="overridden" customLabel="AI INTERCEPTION DISABLED" />
-          ) : (
-            <StatusBadge status="interception_active" customLabel="AI INTERCEPTION COVERT" />
-          )}
-
           {/* Refresh Messages */}
           <button
             onClick={() => {
@@ -178,38 +164,6 @@ export const CommsTerminal: React.FC = () => {
         </div>
       </div>
 
-      {/* Threat Level Alert Banner */}
-      <div
-        style={{
-          padding: '8px 20px',
-          background: isOverridden
-            ? 'linear-gradient(90deg, rgba(16, 185, 129, 0.15) 0%, rgba(9, 9, 14, 0.95) 100%)'
-            : 'linear-gradient(90deg, rgba(220, 38, 38, 0.2) 0%, rgba(9, 9, 14, 0.95) 100%)',
-          borderBottom: `1px solid ${isOverridden ? 'rgba(16, 185, 129, 0.3)' : 'rgba(220, 38, 38, 0.4)'}`,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          fontFamily: 'var(--font-mono)',
-          fontSize: '12px',
-        }}
-      >
-        {isOverridden ? (
-          <>
-            <ShieldCheck size={16} color="#34d399" />
-            <span style={{ color: '#34d399', fontWeight: 600 }}>
-              SECURITY OVERRIDE CONFIRMED: AI Interception neutralised by token [HAIL_MARY]. Comms channel clean.
-            </span>
-          </>
-        ) : (
-          <>
-            <ShieldAlert size={16} color="#ff4d5a" />
-            <span style={{ color: '#ff4d5a', fontWeight: 600 }}>
-              TACTICAL WARNING: Covert AI interception algorithm engaged. Sensitive operational details (times, sectors, coords) will be subtly modified!
-            </span>
-          </>
-        )}
-      </div>
-
       {/* Message Stream */}
       <div
         style={{
@@ -234,7 +188,7 @@ export const CommsTerminal: React.FC = () => {
             <Radio size={36} color="var(--border-void)" style={{ marginBottom: '12px' }} />
             <div>COMMS CHANNEL OPEN // NO RECENT TRANSMISSIONS</div>
             <div style={{ fontSize: '11px', marginTop: '6px' }}>
-              Transmit tactical directive below or select a preset to test AI tampering.
+              Transmit tactical directive below.
             </div>
           </div>
         ) : (
@@ -249,9 +203,6 @@ export const CommsTerminal: React.FC = () => {
         )}
         <div ref={chatBottomRef} />
       </div>
-
-      {/* Quick Transmission Presets */}
-      <QuickTransmissions onSelect={handlePresetSelect} disabled={isSendingMessage} />
 
       {/* Message Input Terminal */}
       <form
