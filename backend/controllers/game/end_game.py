@@ -11,7 +11,7 @@ STATIC_TEXT = SimpleNamespace(
     GAME_START_FAILED="Failed to start the game",
 )
 
-async def start_game(session_id: int):
+async def end_game(session_id: int):
     with Session(Engine) as db:
         try:
             game = db.query(GameSessions).filter(GameSessions.id == session_id).first()
