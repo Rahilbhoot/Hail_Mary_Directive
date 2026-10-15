@@ -3,7 +3,7 @@ import { useGame } from '../../context/GameContext';
 import { useAuth } from '../../context/AuthContext';
 import { TacticalCard } from '../ui/TacticalCard';
 import { GlowingButton } from '../ui/GlowingButton';
-import { ShieldAlert, ShieldCheck, Download, Search, AlertTriangle } from 'lucide-react';
+import { ShieldAlert, ShieldCheck, Download, Search } from 'lucide-react';
 import { soundFx } from '../../services/audio';
 
 export const AuditMatrix: React.FC = () => {
@@ -11,8 +11,6 @@ export const AuditMatrix: React.FC = () => {
   const { currentUser } = useAuth();
   const [filterMode, setFilterMode] = useState<'all' | 'tampered' | 'clean'>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
-
-  const isAdmin = currentUser?.role === 'ADMIN';
 
   const filteredMessages = messages.filter((m) => {
     const isTampered =
@@ -121,15 +119,31 @@ export const AuditMatrix: React.FC = () => {
     );
   };
 
+  if (currentUser?.role === 'ASS') {
+    return (
+      <div style={{ margin: '0 28px 24px 28px' }}>
+        <TacticalCard style={{ textAlign: 'center', padding: '60px 20px' }}>
+          <ShieldAlert size={48} color="var(--accent-red-bright)" style={{ marginBottom: '16px' }} />
+          <h2 style={{ fontSize: '18px', letterSpacing: '2px', color: '#ff4d5a' }}>
+            SECURITY CLEARANCE RESTRICTED // ACCESS DENIED
+          </h2>
+          <p style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', fontSize: '13px', maxWidth: '480px', margin: '8px auto 0 auto' }}>
+            The Neural Interception Audit Matrix is restricted to Mission Control (MC) and Directive Administration (ADMIN). Tactical Assistants (ASS) are not permitted to inspect cryptographic intercept logs.
+          </p>
+        </TacticalCard>
+      </div>
+    );
+  }
+
   return (
     <div style={{ margin: '0 28px 24px 28px' }}>
-      {/* Non-admin notice */}
-      {!isAdmin && (
+      {/* Mission Control notice */}
+      {currentUser?.role === 'MC' && (
         <div
           style={{
             padding: '12px 20px',
-            background: 'rgba(220, 38, 38, 0.15)',
-            border: '1px solid var(--accent-red-pure)',
+            background: 'rgba(168, 85, 247, 0.12)',
+            border: '1px solid rgba(168, 85, 247, 0.5)',
             borderRadius: 'var(--radius-sm)',
             marginBottom: '20px',
             display: 'flex',
@@ -137,12 +151,12 @@ export const AuditMatrix: React.FC = () => {
             gap: '12px',
             fontFamily: 'var(--font-mono)',
             fontSize: '12px',
-            color: 'var(--text-silver)',
+            color: '#e2e8f0',
           }}
         >
-          <AlertTriangle size={18} color="var(--accent-red-bright)" />
+          <ShieldCheck size={18} color="#c084fc" />
           <span>
-            RESTRICTED SECURITY NOTICE: Full neural interception audit requires ADMIN clearance. Field operatives may only inspect declassified logs.
+            MISSION CONTROL AUDIT CLEARANCE VERIFIED: Surveillance & raw neural interception matrix active for Channel #{activeSession?.session_id}.
           </span>
         </div>
       )}

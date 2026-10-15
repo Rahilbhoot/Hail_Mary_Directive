@@ -1,22 +1,49 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useGame } from '../../context/GameContext';
+import { useAuth } from '../../context/AuthContext';
 import { TacticalCard } from '../ui/TacticalCard';
 import { StatusBadge } from '../ui/StatusBadge';
 import { RefreshCw } from 'lucide-react';
 import { soundFx } from '../../services/audio';
 
 export const OperativesList: React.FC = () => {
-  const { allUsers, refreshUsers } = useGame();
+  const { currentUser } = useAuth();
+  const { allUsers, sessions, refreshUsers } = useGame();
+  const isAdmin = currentUser?.role === 'ADMIN';
+
+  // Non-admins only see operatives who belong to their own sessions
+  const visibleUsers = useMemo(() => {
+    if (isAdmin) {
+      return allUsers;
+    }
+
+    const mySessions = sessions.filter((s) => s.users?.includes(currentUser?.email || ''));
+    const mySquadEmails = new Set(mySessions.flatMap((s) => s.users || []));
+    if (currentUser?.email) {
+      mySquadEmails.add(currentUser.email);
+    }
+
+    return Array.from(mySquadEmails).map((email) => {
+      const existing = allUsers.find((u) => u.email.toLowerCase() === email.toLowerCase());
+      if (existing) return existing;
+      return {
+        id: Math.random(),
+        name: email.split('@')[0],
+        email: email,
+        role: email === currentUser?.email ? currentUser.role : ('ASS' as const),
+      };
+    });
+  }, [isAdmin, allUsers, sessions, currentUser]);
 
   return (
     <TacticalCard
-      title="REGISTERED OPERATIVES ROSTER"
-      badge={`${allUsers.length} PERSONNEL`}
+      title={isAdmin ? "REGISTERED OPERATIVES ROSTER" : "MY SQUAD OPERATIVES"}
+      badge={isAdmin ? `${allUsers.length} PERSONNEL` : `${visibleUsers.length} OPERATIVES`}
       badgeVariant="red"
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
         <p style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>
-          CLEARANCE LISTING // CLASSIFIED PERSONNEL
+          {isAdmin ? "CLEARANCE LISTING // CLASSIFIED PERSONNEL" : "PERSONNEL IN YOUR ASSIGNED SESSIONS"}
         </p>
         <button
           onClick={() => {
@@ -49,12 +76,12 @@ export const OperativesList: React.FC = () => {
           overflowY: 'auto',
         }}
       >
-        {allUsers.length === 0 ? (
+        {visibleUsers.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '24px', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)', fontSize: '12px' }}>
-            No operatives recorded in database.
+            {isAdmin ? "No operatives recorded in database." : "No operatives assigned to your sessions yet."}
           </div>
         ) : (
-          allUsers.map((user, idx) => (
+          visibleUsers.map((user, idx) => (
             <div
               key={user.id || user.email || idx}
               style={{

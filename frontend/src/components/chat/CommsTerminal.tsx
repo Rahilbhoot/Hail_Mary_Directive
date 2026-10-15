@@ -37,6 +37,10 @@ export const CommsTerminal: React.FC = () => {
   };
 
   if (!activeSession) {
+    const visibleSessions = currentUser?.role === 'ADMIN'
+      ? sessions
+      : sessions.filter((s) => s.users?.includes(currentUser?.email || ''));
+
     return (
       <div
         className="hud-cut-corners"
@@ -54,11 +58,13 @@ export const CommsTerminal: React.FC = () => {
           NO ACTIVE COMMS CHANNEL SELECTED
         </h2>
         <p style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontSize: '13px', maxWidth: '480px', margin: '0 auto 24px auto' }}>
-          Initialize or select an active tactical session from Mission Control to establish encrypted neural transmission.
+          {currentUser?.role === 'ADMIN'
+            ? 'Initialize or select an active tactical session from Mission Control to establish encrypted neural transmission.'
+            : 'Select an assigned tactical session from Mission Control to establish encrypted neural transmission.'}
         </p>
-        {sessions.length > 0 && (
+        {visibleSessions.length > 0 ? (
           <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
-            {sessions.slice(0, 3).map((s) => (
+            {visibleSessions.slice(0, 3).map((s) => (
               <GlowingButton
                 key={s.session_id}
                 size="sm"
@@ -69,6 +75,10 @@ export const CommsTerminal: React.FC = () => {
               </GlowingButton>
             ))}
           </div>
+        ) : (
+          <p style={{ color: 'var(--text-dim)', fontFamily: 'var(--font-mono)', fontSize: '11px' }}>
+            No tactical sessions currently assigned to your operative clearance.
+          </p>
         )}
       </div>
     );

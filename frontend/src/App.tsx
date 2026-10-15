@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { GameProvider } from './context/GameContext';
 import { StarField } from './components/effects/StarField';
@@ -15,6 +15,12 @@ import type { ViewTab } from './types';
 const MainLayout: React.FC = () => {
   const { currentUser } = useAuth();
   const [currentTab, setCurrentTab] = useState<ViewTab>('dashboard');
+
+  useEffect(() => {
+    if (currentTab === 'audit' && currentUser?.role === 'ASS') {
+      setCurrentTab('dashboard');
+    }
+  }, [currentTab, currentUser?.role]);
 
   if (!currentUser) {
     return <AuthView />;
@@ -34,7 +40,7 @@ const MainLayout: React.FC = () => {
           <DashboardView onOpenComms={() => setCurrentTab('comms')} />
         )}
         {currentTab === 'comms' && <CommsView />}
-        {currentTab === 'audit' && <AuditView />}
+        {currentTab === 'audit' && currentUser?.role !== 'ASS' && <AuditView />}
       </main>
     </div>
   );
