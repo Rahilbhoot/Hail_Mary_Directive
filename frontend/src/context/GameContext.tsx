@@ -45,11 +45,18 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = await api.getAllGames();
       if (response && response.data) {
         setSessions(response.data);
-        // If an active session is currently selected, update its state
+        // If an active session is currently selected, update its state respecting user role
         setActiveSession((prev) => {
-          if (!prev) return response.data[0] || null;
+          const isAllowed = (s: GameSession) =>
+            currentUser?.role === 'ADMIN' || (currentUser?.email ? s.users?.includes(currentUser.email) : false);
+
+          const allowedSessions = response.data.filter(isAllowed);
+
+          if (!prev || !isAllowed(prev)) {
+            return allowedSessions[0] || null;
+          }
           const updated = response.data.find((s) => s.session_id === prev.session_id);
-          return updated || prev;
+          return (updated && isAllowed(updated)) ? updated : (allowedSessions[0] || null);
         });
       }
     } catch {
@@ -57,7 +64,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       setIsLoadingSessions(false);
     }
-  }, []);
+  }, [currentUser]);
 
   // Load all users
   const refreshUsers = useCallback(async () => {
@@ -114,7 +121,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [activeSession?.session_id, refreshMessages, refreshSessions]);
 
   const selectSession = async (sessionId: number) => {
-    const found = sessions.find((s) => s.session_id === sessionId);
+    const isAllowed = (s: GameSession) =>
+      currentUser?.role === 'ADMIN' || (currentUser?.email ? s.users?.includes(currentUser.email) : false);
+
+    const found = sessions.find((s) => s.session_id === sessionId && isAllowed(s));
     if (found) {
       setActiveSession(found);
       prevMessageCountRef.current = 0;

@@ -1,14 +1,25 @@
 import React from 'react';
 import { useGame } from '../../context/GameContext';
+import { useAuth } from '../../context/AuthContext';
 import { TacticalCard } from '../ui/TacticalCard';
 import { Radio, Users, ShieldAlert, KeyRound } from 'lucide-react';
 
 export const TelemetryStats: React.FC = () => {
+  const { currentUser } = useAuth();
   const { sessions, allUsers, messages, activeSession } = useGame();
 
-  const totalSessions = sessions.length;
-  const activeSessionsCount = sessions.filter((s) => s.is_active).length;
-  const totalOperatives = allUsers.length;
+  const isAdmin = currentUser?.role === 'ADMIN';
+  const visibleSessions = isAdmin
+    ? sessions
+    : sessions.filter((s) => s.users?.includes(currentUser?.email || ''));
+
+  const totalSessions = visibleSessions.length;
+  const activeSessionsCount = visibleSessions.filter((s) => s.is_active).length;
+
+  const mySquadEmails = new Set(visibleSessions.flatMap((s) => s.users || []));
+  if (currentUser?.email) mySquadEmails.add(currentUser.email);
+  const totalOperatives = isAdmin ? allUsers.length : mySquadEmails.size;
+
   const tamperedMessagesCount = messages.filter((m) => m.tampered).length;
   const isOverridden = activeSession?.token_found;
 
@@ -26,7 +37,7 @@ export const TelemetryStats: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-dim)', letterSpacing: '1px' }}>
-              CHANNELS ONLINE
+              {isAdmin ? 'CHANNELS ONLINE' : 'ASSIGNED CHANNELS'}
             </div>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '28px', fontWeight: 900, color: 'var(--text-white)', marginTop: '4px' }}>
               {activeSessionsCount} <span style={{ fontSize: '14px', color: 'var(--text-dim)' }}>/ {totalSessions}</span>
@@ -50,7 +61,7 @@ export const TelemetryStats: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-dim)', letterSpacing: '1px' }}>
-              ACTIVE RECRUITS
+              {isAdmin ? 'ACTIVE RECRUITS' : 'SQUAD OPERATIVES'}
             </div>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '28px', fontWeight: 900, color: 'var(--text-white)', marginTop: '4px' }}>
               {totalOperatives}

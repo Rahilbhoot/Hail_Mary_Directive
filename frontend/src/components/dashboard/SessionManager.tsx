@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useGame } from '../../context/GameContext';
+import { useAuth } from '../../context/AuthContext';
 import { TacticalCard } from '../ui/TacticalCard';
 import { GlowingButton } from '../ui/GlowingButton';
 import { StatusBadge } from '../ui/StatusBadge';
@@ -11,6 +12,7 @@ interface SessionManagerProps {
 }
 
 export const SessionManager: React.FC<SessionManagerProps> = ({ onOpenComms }) => {
+  const { currentUser } = useAuth();
   const {
     sessions,
     activeSession,
@@ -19,6 +21,11 @@ export const SessionManager: React.FC<SessionManagerProps> = ({ onOpenComms }) =
     startSession,
     allUsers,
   } = useGame();
+
+  const isAdmin = currentUser?.role === 'ADMIN';
+  const visibleSessions = isAdmin
+    ? sessions
+    : sessions.filter((s) => s.users?.includes(currentUser?.email || ''));
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
@@ -76,29 +83,37 @@ export const SessionManager: React.FC<SessionManagerProps> = ({ onOpenComms }) =
             TACTICAL SESSIONS GRID
           </h2>
           <p style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-muted)', margin: '4px 0 0 0' }}>
-            OPERATIONAL FREQUENCIES // ENCRYPTED NEURAL LINKS
+            {isAdmin
+              ? 'OPERATIONAL FREQUENCIES // ENCRYPTED NEURAL LINKS'
+              : 'ASSIGNED FREQUENCIES // INVOLVED SESSIONS ONLY'}
           </p>
         </div>
 
-        <GlowingButton
-          size="sm"
-          variant="primary"
-          icon={<Plus size={15} />}
-          onClick={handleOpenModal}
-        >
-          INITIALIZE NEW SESSION
-        </GlowingButton>
+        {isAdmin && (
+          <GlowingButton
+            size="sm"
+            variant="primary"
+            icon={<Plus size={15} />}
+            onClick={handleOpenModal}
+          >
+            INITIALIZE NEW SESSION
+          </GlowingButton>
+        )}
       </div>
 
       {/* Grid of Sessions */}
-      {sessions.length === 0 ? (
+      {visibleSessions.length === 0 ? (
         <TacticalCard style={{ textAlign: 'center', padding: '48px 20px' }}>
           <ShieldAlert size={36} color="var(--border-void)" style={{ marginBottom: '12px' }} />
           <div style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-silver)', fontSize: '14px' }}>
-            NO ACTIVE SESSIONS FOUND IN DIRECTIVE DATABASE
+            {isAdmin
+              ? 'NO ACTIVE SESSIONS FOUND IN DIRECTIVE DATABASE'
+              : 'YOU ARE NOT ASSIGNED TO ANY ACTIVE TACTICAL SESSIONS'}
           </div>
           <p style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-dim)', fontSize: '12px', marginTop: '6px' }}>
-            Click &apos;INITIALIZE NEW SESSION&apos; above to form an operative squad.
+            {isAdmin
+              ? "Click 'INITIALIZE NEW SESSION' above to form an operative squad."
+              : "Contact Command Administration to be assigned to a tactical comms cell."}
           </p>
         </TacticalCard>
       ) : (
@@ -109,7 +124,7 @@ export const SessionManager: React.FC<SessionManagerProps> = ({ onOpenComms }) =
             gap: '16px',
           }}
         >
-          {sessions.map((session) => {
+          {visibleSessions.map((session) => {
             const isSelected = activeSession?.session_id === session.session_id;
 
             return (
