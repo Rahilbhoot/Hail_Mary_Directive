@@ -1,0 +1,272 @@
+/* ==========================================================================
+   HAIL MARY DIRECTIVE - TACTICAL SPACE THEME (RED × BLACK × WHITE)
+   ========================================================================== */
+
+:root {
+  /* Color Palette: Deep Space Void & Crimson Accents */
+  --bg-void: #060608;
+  --bg-space: #09090e;
+  --bg-surface: #101017;
+  --bg-surface-elevated: #161622;
+  --bg-surface-hover: #1e1e2d;
+  --bg-glass: rgba(12, 12, 18, 0.85);
+  --bg-glass-heavy: rgba(8, 8, 12, 0.94);
+
+  /* Red Accents & Alert Spectrum */
+  --accent-red-pure: #dc2626;
+  --accent-red-bright: #ff2b3e;
+  --accent-red-deep: #991b1b;
+  --accent-red-dark: #450a0a;
+  --accent-crimson: #b91c1c;
+
+  /* Red Glow Tokens */
+  --glow-red-subtle: 0 0 10px rgba(220, 38, 38, 0.25);
+  --glow-red-md: 0 0 20px rgba(220, 38, 38, 0.45);
+  --glow-red-lg: 0 0 35px rgba(239, 68, 68, 0.65);
+  --glow-red-intense: 0 0 50px rgba(255, 43, 62, 0.85);
+  --glow-text-red: 0 0 8px rgba(255, 60, 75, 0.7);
+
+  /* Clean Status Spectrum */
+  --status-green: #10b981;
+  --status-green-glow: 0 0 15px rgba(16, 185, 129, 0.5);
+  --status-amber: #f59e0b;
+  --status-amber-glow: 0 0 15px rgba(245, 158, 11, 0.5);
+
+  /* Text Typography */
+  --text-white: #ffffff;
+  --text-silver: #e2e8f0;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  --text-dark: #334155;
+
+  /* Tactical Borders */
+  --border-void: #1e1e2d;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-red-faint: rgba(220, 38, 38, 0.3);
+  --border-red-active: rgba(255, 43, 62, 0.85);
+
+  /* Font Families */
+  --font-display: 'Orbitron', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-hud: 'Rajdhani', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+
+  /* Spacing */
+  --space-2xs: 2px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+
+  /* Border Radii */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-slow: 0.4s ease;
+}
+
+/* Base Reset & Cosmic Setup */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--bg-void);
+  color: var(--text-white);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Custom Tactical Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-void);
+  border-left: 1px solid var(--border-void);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--accent-red-deep);
+  border-radius: var(--radius-xs);
+  box-shadow: inset 0 0 4px rgba(220, 38, 38, 0.5);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-red-pure);
+}
+
+/* Typography Presets */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-white);
+}
+
+.font-hud {
+  font-family: var(--font-hud);
+  letter-spacing: 0.06em;
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* HUD Chamfered Cut Corner Utility */
+.hud-cut-corners {
+  clip-path: polygon(
+    0 8px,
+    8px 0,
+    calc(100% - 8px) 0,
+    100% 8px,
+    100% calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    8px 100%,
+    0 calc(100% - 8px)
+  );
+}
+
+.hud-cut-corners-top {
+  clip-path: polygon(
+    0 10px,
+    10px 0,
+    calc(100% - 10px) 0,
+    100% 10px,
+    100% 100%,
+    0 100%
+  );
+}
+
+/* Tactical Glow Utilities */
+.glow-text-red {
+  text-shadow: var(--glow-text-red);
+}
+
+.glow-box-red {
+  box-shadow: var(--glow-red-md);
+}
+
+.glow-box-red-intense {
+  box-shadow: var(--glow-red-intense);
+}
+
+/* Keyframe Animations */
+@keyframes pulse-red {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.4);
+    border-color: rgba(220, 38, 38, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(255, 43, 62, 0.8);
+    border-color: rgba(255, 43, 62, 0.9);
+  }
+}
+
+@keyframes pulse-dot {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.85);
+  }
+}
+
+@keyframes scanline-scroll {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(1000%); }
+}
+
+@keyframes glitch-shake {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 1px); }
+  40% { transform: translate(2px, -1px); }
+  60% { transform: translate(-1px, -1px); }
+  80% { transform: translate(1px, 2px); }
+  100% { transform: translate(0); }
+}
+
+@keyframes hud-grid-drift {
+  0% { background-position: 0 0; }
+  100% { background-position: 40px 40px; }
+}
+
+@keyframes alert-flicker {
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.6; }
+  94% { opacity: 1; }
+  96% { opacity: 0.4; }
+  98% { opacity: 1; }
+}
+
+/* Background HUD Grid */
+.bg-grid-overlay {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.bg-radar-grid {
+  background-image: 
+    radial-gradient(circle at center, rgba(220, 38, 38, 0.05) 0%, transparent 70%),
+    linear-gradient(to right, rgba(220, 38, 38, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(220, 38, 38, 0.04) 1px, transparent 1px);
+  background-size: 100% 100%, 24px 24px, 24px 24px;
+}
+
+/* Buttons & Interactive Elements */
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  transition: all var(--transition-normal);
+}
+
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--accent-red-bright);
+  outline-offset: 2px;
+}
+
+input, select, textarea {
+  color: var(--text-white);
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-void);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  transition: all var(--transition-fast);
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent-red-pure);
+  box-shadow: var(--glow-red-subtle);
+  background: #191926;
+}
+
+/* Tactical Selection highlight */
+::selection {
+  background: var(--accent-red-pure);
+  color: #ffffff;
+}
