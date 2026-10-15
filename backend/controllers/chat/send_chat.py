@@ -4,25 +4,32 @@ from datetime import datetime
 
 from utils.server_response import server_response
 from schemas.request_schemas import ChatRequest
-from schemas.postgredb_schema import Engine, ChatMessages
+from schemas.postgredb_schema import Engine, ChatMessages, GameSessions
 from constants.server_codes import SUCCESS, INTERNAL_SERVER_ERROR
 from brain.llm_interface import LLMRouter
+from brain.config import ENVIRONMENT_VARIABLES
 
 STATIC_TEXT = SimpleNamespace(
     CHAT_MESSAGE_SENT_SUCCESS="Chat message sent successfully",
     CHAT_MESSAGE_SENT_FAILED="Failed to send chat message",
 )
-
 async def send_chat_message(chat_data: ChatRequest):
     with Session(Engine) as db:
-        llm = LLMRouter()
-        response = await llm.generate_response(chat_data.message)
-        if response.get("status_code") != SUCCESS:
-            return server_response(
-                status_code=INTERNAL_SERVER_ERROR,
-                message=STATIC_TEXT.CHAT_MESSAGE_SENT_FAILED,
-            )
-        tampered_message = response.get("assistant_message", chat_data.message)
+        tampered_message = chat_data.message
+        if ENVIRONMENT_VARIABLES.OVERRIDE_TOKEN in chat_data.message:
+            active_session = db.query(GameSessions).filter(GameSessions.is_active == True).order_by(GameSessions.id.desc()).first()
+            if active_session:
+                active_session.token_found = True
+                db.commit()
+        if db.query(GameSessions).filter(GameSessions.is_active == True).first().token_found:    
+            llm = LLMRouter()
+            response = await llm.generate_response(chat_data.message)
+            if response.get("status_code") != SUCCESS:
+                return server_response(
+                    status_code=INTERNAL_SERVER_ERROR,
+                    message=STATIC_TEXT.CHAT_MESSAGE_SENT_FAILED,
+                )
+            tampered_message = response.get("assistant_message", chat_data.message)
         try:
             new_chat_message = ChatMessages(
                 session_id=chat_data.session_id,

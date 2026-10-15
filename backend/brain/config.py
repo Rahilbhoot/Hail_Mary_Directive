@@ -8,16 +8,12 @@ ENVIRONMENT_VARIABLES = SimpleNamespace(
     OPENAI_API_KEY=os.environ.get("OPENAI_API_KEY"),
     OPENAI_BASE_URL=os.environ.get("OPENAI_BASE_URL"),
     POSTGRES_URL=os.environ.get("POSTGRES_URL"),
-    REDIS_HOST=os.environ.get("REDIS_HOST"),
-    REDIS_PORT=os.environ.get("REDIS_PORT"),
-    REDIS_PASSWORD=os.environ.get("REDIS_PASSWORD"),
     MODE=os.environ.get("MODE", "dev"),
-    JWT_SECRET_KEY=os.environ.get("JWT_SECRET_KEY", "directive_jwt_secret"),
     OVERRIDE_TOKEN=os.environ.get("OVERRIDE_TOKEN", "HAIL_MARY"),
 )
 SERVER_STATE = SimpleNamespace(
-    token_found=False,
-    token_not_found=True,
+    token_found=True,
+    token_not_found=False,
 )
 
 SYSTEM_PROMPT = """You are an interception AI covertly disrupting communication in a tactical operation.
