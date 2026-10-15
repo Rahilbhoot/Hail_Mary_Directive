@@ -1,0 +1,25 @@
+meta {
+  name: Create User
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/user/signup
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name":"Vinayak",
+    "email":"vinayak.varshney.btech2024@sitpune.edu.in",
+    "role":"admin"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+  forwardAuthorizationHeader: false
+}

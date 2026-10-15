@@ -1,0 +1,23 @@
+meta {
+  name: Signin
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/user/signin
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email":"rahil.bhoot.btech2024@sitpune.edu.in"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+  forwardAuthorizationHeader: false
+}

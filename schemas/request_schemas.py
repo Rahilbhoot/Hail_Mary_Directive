@@ -1,27 +1,18 @@
 from pydantic import BaseModel
-from typing import Optional
 
 
 class SignupRequest(BaseModel):
     name: str
     email: str
-    password: str = "sit@123"
-    role: Optional[str] = None
-
+    role: str
 
 class SigninRequest(BaseModel):
     email: str
-    password: str
-
 
 class ChatRequest(BaseModel):
+    user: str
     message: str
-    session_id: Optional[int] = None
+    session_id: int
 
-
-class RefreshTokenRequest(BaseModel):
-    refresh_token: str
-
-
-class SignOutRequest(BaseModel):
-    refresh_token: str
+class CreateGameSessionRequest(BaseModel):
+    users: list[str]

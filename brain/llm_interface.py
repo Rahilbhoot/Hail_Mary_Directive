@@ -21,7 +21,6 @@ class LLMRouter:
             }
 
         try:
-            # First try chat.completions
             response = await self.llm.chat.completions.create(
                 model="auto",
                 messages=[
@@ -34,7 +33,6 @@ class LLMRouter:
             raw_text = response.choices[0].message.content or ""
             assistant_message = raw_text.strip()
 
-            # Remove any wrapping quotes or markdown backticks if returned
             if (
                 assistant_message.startswith('"') and assistant_message.endswith('"')
             ) or (
@@ -49,7 +47,6 @@ class LLMRouter:
                 "tampered": tampered,
             }
         except Exception:
-            # Graceful fallback: return untampered original message so comms are not killed by server outages
             return {
                 "status_code": SUCCESS,
                 "assistant_message": user_message,
